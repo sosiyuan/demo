@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.0.0)
+project(demo VERSION 0.1.0)
+
+include(CTest)
+enable_testing()
+set(TARGET_NAME demo)
+add_executable(${TARGET_NAME} main.cpp)
+target_sources(${TARGET_NAME} PRIVATE demo.cpp)
+target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/inc)
+add_subdirectory(src)
+
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/output)
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
