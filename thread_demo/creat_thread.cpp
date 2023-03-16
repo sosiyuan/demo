@@ -30,19 +30,23 @@ public:
     explicit thread_guard(std::thread &t_) : t(t_) {}
     ~thread_guard()
     {
-#if defined(THREAD_MODULE) && (THREAD_MODULE == JOIN_MODE)
         if (t.joinable())
         {
+#if defined(THREAD_MODULE) && (THREAD_MODULE == JOIN_MODE)
             t.join();
-        }
 #else
-        t.detach();
+            t.detach();
 #endif
+        }
     }
     thread_guard(thread_guard const &) = delete;
     thread_guard &operator=(thread_guard const &) = delete;
 };
 
+/**
+ * @brief 创建线程
+ *
+ */
 void demo::CreatThread()
 {
     // 变量定义1 —— 传入对象
@@ -62,11 +66,60 @@ void demo::CreatThread()
     thread_guard my_thread_gurad3(my_thread3);
 
     // 变量定义3 —— lambda表达式
-    std::thread my_thread4([]{
+    std::thread my_thread4([]
+                           {
         background_task::do_something();
         background_task::do_something_else(); });
     thread_guard my_thread_gurad4(my_thread4);
 
     printf("end\r\n");
+}
 
+class big_object
+{
+public:
+    void prepare_data(int data)
+    {
+        m_data = data;
+        printf("%s %d\r\n", __FUNCTION__, data);
+    }
+
+    void process_big_object()
+    {
+        while (m_data-- > 0)
+        {
+            printf("%s %d %p\r\n", __FUNCTION__, m_data, this);
+        }
+    }
+
+private:
+    int m_data;
+};
+
+/**
+ * @brief 通过std::move 将参数传入线程 —— 转移变量所有权
+ *
+ */
+void demo::ThreadParaMove()
+{
+    std::unique_ptr<big_object> p(new big_object);
+    p->prepare_data(5);
+    // move之后，转移p的所有权，原p指向nullptr
+    std::thread t(big_object::process_big_object, std::move(p));
+    t.join();
+    return;
+}
+
+/**
+ * @brief 线程所有权转移（std::move)
+ *
+ */
+void demo::ThreadMove()
+{
+    std::thread t1(background_task::do_something);        // 1
+    std::thread t2 = std::move(t1);                       // 2
+    t1 = std::thread(background_task::do_something_else); // 3
+    std::thread t3;                                       // 4
+    t3 = std::move(t2);                                   // 5
+    t1 = std::move(t3);                                   // 6 赋值操作将使程序崩溃
 }

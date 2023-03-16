@@ -5,7 +5,9 @@ namespace demo
 {
 
     void CreatThread();
+    void ThreadParaMove();
+    void ThreadMove();
 
-};// namespace demo
+}; // namespace demo
 
 #endif
