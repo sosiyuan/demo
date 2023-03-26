@@ -77,20 +77,20 @@ void SemDemo()
         case 1:
             // 创建线程 1
             pthread_create(&a_thread, NULL, func1, NULL);
-            // 信号量 + 1，进而触发 func1 的任务
-            sem_post(&semDownload);
             // 总线程数 + 1
             g_phreadNum++;
+            // 信号量 + 1，进而触发 func1 的任务
+            sem_post(&semDownload);
             break;
         case 2:
             pthread_create(&b_thread, NULL, func2, NULL);
-            sem_post(&semDownload);
             g_phreadNum++;
+            sem_post(&semDownload);
             break;
         case 3:
             pthread_create(&c_thread, NULL, func3, NULL);
-            sem_post(&semDownload);
             g_phreadNum++;
+            sem_post(&semDownload);
             break;
         default:
             printf("!!! error taskTypeId %d !!!\n", taskTypeId);
