@@ -23,6 +23,7 @@ namespace ThreadSafeByStaticConstract
         {
 #if defined(MODE) && MODE == 1
             // 非线程安全
+            // 存在条件竞争，会导致未定义的结果
             if (p == nullptr)
             {
                 p = new StaticClassDemo();
@@ -30,6 +31,7 @@ namespace ThreadSafeByStaticConstract
             return p;
 #elif defined(MODE) && MODE == 2
             // 线程安全 —— 双重检查锁
+            // 存在条件竞争，会导致未定义的结果
             if (p == nullptr)
             {
                 std::lock_guard<std::mutex> lg(SingletonLock);
@@ -38,6 +40,18 @@ namespace ThreadSafeByStaticConstract
                     p = new StaticClassDemo();
                 }
             }
+            return p;
+#elif defined(MODE) && MODE == 3
+            // C++标准库 —— call_once; 消耗的资源比互斥锁少
+            // 延时初始化，不存在条件竞争
+            void (*pFunc)() = []
+            {
+                if (p == nullptr)
+                {
+                    p = new StaticClassDemo();
+                }
+            };
+            std::call_once(singletonInitFlag, pFunc);
             return p;
 #else
             // 静态创建型单例模式
@@ -49,7 +63,9 @@ namespace ThreadSafeByStaticConstract
 
     private:
         static StaticClassDemo *p;
+        static std::once_flag singletonInitFlag;
     };
+    std::once_flag StaticClassDemo::singletonInitFlag;
     StaticClassDemo *StaticClassDemo::p = nullptr;
 
     sem_t TestStaticSem;
