@@ -1,9 +1,13 @@
 #include "signal_demo.h"
 #include <iostream>
 #include <thread>
+#include <mutex>
 
 namespace ThreadSafeByStaticConstract
 {
+#define MODE 3
+    std::mutex SingletonLock;
+
     // 线程安全 —— 静态创建对象
     struct StaticClassDemo
     {
@@ -17,12 +21,30 @@ namespace ThreadSafeByStaticConstract
         }
         static StaticClassDemo *GetInstance()
         {
+#if defined(MODE) && MODE == 1
             // 非线程安全
             if (p == nullptr)
             {
                 p = new StaticClassDemo();
             }
             return p;
+#elif defined(MODE) && MODE == 2
+            // 线程安全 —— 双重检查锁
+            if (p == nullptr)
+            {
+                std::lock_guard<std::mutex> lg(SingletonLock);
+                if (p == nullptr)
+                {
+                    p = new StaticClassDemo();
+                }
+            }
+            return p;
+#else
+            // 静态创建型单例模式
+            // 静态变量的构造函数、析构函数是线程安全的
+            static StaticClassDemo s_StaticClassDemo;
+            return &s_StaticClassDemo;
+#endif
         }
 
     private:
@@ -34,13 +56,7 @@ namespace ThreadSafeByStaticConstract
 
     void TestStatic()
     {
-#if 0
-        // 静态变量的构造函数、析构函数是线程安全的
-        static StaticClassDemo staticClassDemo;
-        StaticClassDemo *pStaticClassDemo = &staticClassDemo;
-#else
         StaticClassDemo *pStaticClassDemo = StaticClassDemo::GetInstance();
-#endif
         sem_wait(&TestStaticSem);
         std::cout << "TestStatic:" << pStaticClassDemo << std::endl;
         sem_post(&TestStaticSem);
