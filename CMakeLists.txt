@@ -3,6 +3,8 @@ project(demo VERSION 0.1.0)
 
 include(CTest)
 enable_testing()
+set(CMAKE_CXX_STANDARD 20)
+
 set(TARGET_NAME demo)
 add_executable(${TARGET_NAME} main.cpp)
 target_sources(${TARGET_NAME} PRIVATE demo.cpp)
