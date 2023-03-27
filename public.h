@@ -20,4 +20,12 @@ struct RegDemoFunc
     }
 };
 
+#define REG_DEMO_FUNC(p)       \
+    static struct RegDemoFuncS \
+    {                          \
+        RegDemoFuncS()         \
+        {                      \
+            RegDemoFunc()(p);  \
+        }                      \
+    } s_regDemoFunc;
 #endif // __PUBLIC_H__

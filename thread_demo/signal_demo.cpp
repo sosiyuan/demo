@@ -98,11 +98,4 @@ namespace ThreadSafeByStaticConstract
     }
 }; // namespace ThreadSafeByStaticConstract
 
-static struct RegDemoFuncS
-{
-    RegDemoFuncS()
-    {
-        RegDemoFunc()(ThreadSafeByStaticConstract::DemoMain);
-        // RegDemoFunc()(SemDemo);
-    }
-} s_regDemoFunc;
+// REG_DEMO_FUNC(ThreadSafeByStaticConstract::DemoMain);
