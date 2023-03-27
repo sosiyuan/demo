@@ -55,7 +55,7 @@ namespace ThreadSafeByStaticConstract
             return p;
 #else
             // 静态创建型单例模式
-            // 静态变量的构造函数、析构函数是线程安全的
+            // c++11 标准下 静态变量的构造函数、析构函数是线程安全的
             static StaticClassDemo s_StaticClassDemo;
             return &s_StaticClassDemo;
 #endif
